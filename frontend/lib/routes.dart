@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:frontend/view/users/users_view.dart';
+import 'package:frontend/view/user/list_user_view.dart';
 
 final router = GoRouter(
   initialLocation: '/',

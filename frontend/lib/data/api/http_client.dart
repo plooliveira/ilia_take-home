@@ -1,0 +1,78 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:http/http.dart' as http;
+
+const _timeoutMessage = 'Tempo de resposta excedido (TimeoutException)';
+const _noConnectionMessage = 'Sem conexão com a internet (SocketException)';
+final _baseUrl = 'http://localhost:3000/';
+
+class NetworkException implements Exception {
+  final String message;
+  final int statusCode;
+  NetworkException(this.message, this.statusCode);
+}
+
+abstract class ApiClient {
+  Future<dynamic> get(String url);
+  Future<dynamic> post(String url, Map<String, dynamic> data);
+}
+
+// implementação usando http package
+
+class HttpApiClient implements ApiClient {
+  static const _timeoutDuration = Duration(seconds: 10);
+
+  @override
+  Future<dynamic> get(String url) async {
+    try {
+      final response = await http
+          .get(Uri.parse(_baseUrl + url))
+          .timeout(_timeoutDuration);
+
+      return _handleResponse(response);
+    } on SocketException {
+      throw NetworkException(_noConnectionMessage, 0);
+    } on TimeoutException {
+      throw NetworkException(_timeoutMessage, 408);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<dynamic> post(String url, Map<String, dynamic> data) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse(_baseUrl + url),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(data),
+          )
+          .timeout(_timeoutDuration);
+
+      return _handleResponse(response);
+    } on SocketException {
+      throw NetworkException(_noConnectionMessage, 0);
+    } on TimeoutException {
+      throw NetworkException(_timeoutMessage, 408);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  dynamic _handleResponse(http.Response response) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (response.body.isEmpty) return null;
+      return jsonDecode(response.body);
+    } else {
+      throw NetworkException(
+        response.body.isNotEmpty
+            ? jsonDecode(response.body)['message'] ?? 'Erro desconhecido'
+            : 'Erro desconhecido',
+        response.statusCode,
+      );
+    }
+  }
+}
