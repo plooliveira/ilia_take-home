@@ -20,9 +20,12 @@ class UserRepository {
     }
   }
 
-  Future<Result<bool>> createUser(Map<String, String> userData) async {
+  Future<Result<bool>> createUser({
+    required String name,
+    required String email,
+  }) async {
     try {
-      await apiClient.post('users', userData);
+      await apiClient.post('users', {'name': name, 'email': email});
       return Ok(true);
     } on NetworkException catch (e) {
       return Err(e.message);

@@ -1,14 +1,14 @@
 import 'package:ctrl/ctrl.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/view/user/user_controller.dart';
-import 'package:frontend/view/user/widgets/user_card_wiget.dart';
-import 'package:frontend/view/user/widgets/user_list_widget.dart';
-import 'package:frontend/view/user/widgets/users_empty_widget.dart';
-import 'package:frontend/view/user/widgets/users_error_widget.dart';
+import 'package:frontend/view/user/list/user_controller.dart';
+import 'package:frontend/view/user/create/user_create_form.dart';
+import 'package:frontend/view/user/list/widgets/user_list.dart';
+import 'package:frontend/view/user/list/widgets/users_empty.dart';
+import 'package:frontend/view/user/list/widgets/users_error.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shimmer/shimmer.dart';
 
 const _noUsersFound = "Nenhum usuário encontrado";
+const _title = "Usuários";
 
 class UsersRoute extends GoRoute {
   UsersRoute()
@@ -23,13 +23,27 @@ class UsersView extends StatefulWidget {
 }
 
 class _UsersViewState extends CtrlState<UsersView> {
-  late final UserController controller;
+  late final UserCtrl ctrl;
 
   @override
   void initState() {
     super.initState();
-    controller = useCtrl();
-    controller.getUsers();
+    ctrl = useCtrl();
+    ctrl.getUsers();
+  }
+
+  void showCreateBottonSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return UserForm(
+          onUserCreated: () {
+            Navigator.pop(context);
+            ctrl.getUsers();
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -38,7 +52,7 @@ class _UsersViewState extends CtrlState<UsersView> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'Usuários',
+          _title,
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
@@ -47,9 +61,9 @@ class _UsersViewState extends CtrlState<UsersView> {
         foregroundColor: Colors.black87,
         actions: [
           Watch(
-            controller.isLoading,
+            ctrl.isLoading,
             builder: (context, isLoading) {
-              return isLoading && !controller.users.value.firstLoad
+              return isLoading && !ctrl.users.value.firstLoad
                   ? const Padding(
                       padding: EdgeInsets.only(right: 16.0),
                       child: Center(
@@ -66,16 +80,16 @@ class _UsersViewState extends CtrlState<UsersView> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => controller.getUsers(),
+        onRefresh: () => ctrl.getUsers(),
         child: GroupWatch(
-          [controller.users],
+          [ctrl.users],
           builder: (context) {
-            final state = controller.users.value;
+            final state = ctrl.users.value;
 
             if (state.hasError) {
               return UsersErrorWidget(
                 error: state.error,
-                onRetry: () => controller.getUsers(),
+                onRetry: () => ctrl.getUsers(),
               );
             }
 
@@ -85,7 +99,7 @@ class _UsersViewState extends CtrlState<UsersView> {
 
             return UserList(
               users: state.users,
-              isLoading: controller.isLoading.value && state.firstLoad,
+              isLoading: ctrl.isLoading.value && state.firstLoad,
               onUserTap: (user) {
                 // Future navigation to user details or whatever...
               },
@@ -95,26 +109,9 @@ class _UsersViewState extends CtrlState<UsersView> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // bottom sheet to create user
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return const UserCreateForm();
-            },
-          );
-        },
+        onPressed: () => showCreateBottonSheet(context),
         child: const Icon(Icons.add),
       ),
     );
-  }
-}
-
-class UserCreateForm extends CtrlWidget<UserController> {
-  const UserCreateForm({super.key});
-
-  @override
-  Widget build(BuildContext context, controller) {
-    return const Placeholder();
   }
 }

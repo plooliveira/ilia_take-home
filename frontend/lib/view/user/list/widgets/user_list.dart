@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/user_model.dart';
-import 'package:frontend/view/user/widgets/user_card_wiget.dart';
+import 'package:frontend/view/user/list/widgets/user_card.dart';
 import 'package:shimmer/shimmer.dart';
 
 class UserList extends StatelessWidget {

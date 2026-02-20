@@ -10,8 +10,8 @@ class UserState {
   bool firstLoad = true;
 }
 
-class UserController with Ctrl {
-  UserController({required UserRepository userRepository})
+class UserCtrl with Ctrl {
+  UserCtrl({required UserRepository userRepository})
     : _userRepository = userRepository;
 
   final UserRepository _userRepository;
