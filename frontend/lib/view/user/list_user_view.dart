@@ -1,10 +1,12 @@
 import 'package:ctrl/ctrl.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/view/user/user_controller.dart';
+import 'package:frontend/view/user/widgets/user_card_wiget.dart';
 import 'package:frontend/view/user/widgets/user_list_widget.dart';
 import 'package:frontend/view/user/widgets/users_empty_widget.dart';
 import 'package:frontend/view/user/widgets/users_error_widget.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 
 const _noUsersFound = "Nenhum usuário encontrado";
 
@@ -47,7 +49,7 @@ class _UsersViewState extends CtrlState<UsersView> {
           Watch(
             controller.isLoading,
             builder: (context, isLoading) {
-              return isLoading
+              return isLoading && !controller.users.value.firstLoad
                   ? const Padding(
                       padding: EdgeInsets.only(right: 16.0),
                       child: Center(
@@ -66,24 +68,24 @@ class _UsersViewState extends CtrlState<UsersView> {
       body: RefreshIndicator(
         onRefresh: () => controller.getUsers(),
         child: GroupWatch(
-          [controller.users, controller.error],
+          [controller.users],
           builder: (context) {
-            final users = controller.users.value;
-            final error = controller.error.value;
+            final state = controller.users.value;
 
-            if (error.isNotEmpty) {
+            if (state.hasError) {
               return UsersErrorWidget(
-                error: error,
+                error: state.error,
                 onRetry: () => controller.getUsers(),
               );
             }
 
-            if (users.isEmpty) {
+            if (state.users.isEmpty && !state.firstLoad) {
               return const UsersEmptyWidget(message: _noUsersFound);
             }
 
             return UserList(
-              users: users,
+              users: state.users,
+              isLoading: controller.isLoading.value && state.firstLoad,
               onUserTap: (user) {
                 // Future navigation to user details or whatever...
               },
