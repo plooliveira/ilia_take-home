@@ -1,6 +1,9 @@
 import 'package:ctrl/ctrl.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/view/user/user_controller.dart';
+import 'package:frontend/view/user/widgets/user_list_widget.dart';
+import 'package:frontend/view/user/widgets/users_empty_widget.dart';
+import 'package:frontend/view/user/widgets/users_error_widget.dart';
 import 'package:go_router/go_router.dart';
 
 const _noUsersFound = "Nenhum usuário encontrado";
@@ -30,38 +33,86 @@ class _UsersViewState extends CtrlState<UsersView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Usuários')),
-      body: GroupWatch(
-        [controller.users, controller.isLoading, controller.error],
-        builder: (context) {
-          final users = controller.users.value;
-          final isLoading = controller.isLoading.value;
-          final error = controller.error.value;
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          'Usuários',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        actions: [
+          Watch(
+            controller.isLoading,
+            builder: (context, isLoading) {
+              return isLoading
+                  ? const Padding(
+                      padding: EdgeInsets.only(right: 16.0),
+                      child: Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink();
+            },
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => controller.getUsers(),
+        child: GroupWatch(
+          [controller.users, controller.error],
+          builder: (context) {
+            final users = controller.users.value;
+            final error = controller.error.value;
 
-          if (error.isNotEmpty) {
-            return Center(child: Text(error));
-          }
-
-          if (users.isEmpty) {
-            return const Center(child: Text(_noUsersFound));
-          }
-
-          if (isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-              return ListTile(
-                title: Text(user.name),
-                subtitle: Text(user.email),
+            if (error.isNotEmpty) {
+              return UsersErrorWidget(
+                error: error,
+                onRetry: () => controller.getUsers(),
               );
+            }
+
+            if (users.isEmpty) {
+              return const UsersEmptyWidget(message: _noUsersFound);
+            }
+
+            return UserList(
+              users: users,
+              onUserTap: (user) {
+                // Future navigation to user details or whatever...
+              },
+            );
+          },
+        ),
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // bottom sheet to create user
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return const UserCreateForm();
             },
           );
         },
+        child: const Icon(Icons.add),
       ),
     );
+  }
+}
+
+class UserCreateForm extends CtrlWidget<UserController> {
+  const UserCreateForm({super.key});
+
+  @override
+  Widget build(BuildContext context, controller) {
+    return const Placeholder();
   }
 }
