@@ -6,7 +6,8 @@ import { User } from "../user_model";
  
 export interface UserRepository {
   create(createUserDto: CreateUserDto): Promise<User>;
-  findAll(): Promise<User[]>;
+  findAll(skip?: number, take?: number): Promise<User[]>;
+  count(): Promise<number>;
 }
 
 // Export with Symbol
