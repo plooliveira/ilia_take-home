@@ -29,12 +29,23 @@ export class PrismaUserRepository implements UserRepository  {
         }
     }
 
-    async findAll(): Promise<User[]> {
+    async findAll(skip?: number, take?: number): Promise<User[]> {
         try {
-            const users = await prisma.user.findMany();
+            const users = await prisma.user.findMany({
+                skip: skip,
+                take: take,
+            });
             return users as User[];
         } catch (error) {
             throw new Error('Failed to fetch users from database');
+        }
+    }
+
+    async count(): Promise<number> {
+        try {
+            return prisma.user.count();
+        } catch (error) {
+            throw new Error('Failed to count users from database');
         }
     }
 }
