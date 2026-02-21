@@ -1,8 +1,9 @@
 // User Controller
 
-import { Controller, Get, Post, Body, ConflictException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, ConflictException, BadRequestException, InternalServerErrorException, Query } from '@nestjs/common';
 import { UserService } from './user_service';
 import { CreateUserDto } from './data/user_dto';
+import { PaginationDto } from '../../shared/data/pagination_dto';
 
 @Controller('users')
 export class UserController {
@@ -24,8 +25,8 @@ export class UserController {
   }
 
   @Get()
-  async findAll() {
-    const result = await this.userService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto) {
+    const result = await this.userService.findAll(paginationDto.page!, paginationDto.limit!);
     
     if (result.isError) {
       throw new InternalServerErrorException(result.error?.message || 'Failed to fetch users');

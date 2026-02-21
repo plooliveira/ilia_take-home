@@ -9,8 +9,8 @@ import { prisma } from "../../../../prisma/prisma";
 import { Prisma } from "../../../../generated/prisma/client";
 
 @Injectable()
-export class PrismaUserRepository implements UserRepository  {
-    async create(createUserDto: CreateUserDto): Promise<User> {    
+export class PrismaUserRepository implements UserRepository {
+    async create(createUserDto: CreateUserDto): Promise<User> {
         try {
             const user = await prisma.user.create({
                 data: {
@@ -29,12 +29,24 @@ export class PrismaUserRepository implements UserRepository  {
         }
     }
 
-    async findAll(): Promise<User[]> {
+    async findAll(skip?: number, take?: number): Promise<User[]> {
         try {
-            const users = await prisma.user.findMany();
+            const users = await prisma.user.findMany({
+                skip: skip,
+                take: take,
+                orderBy: { createdAt: 'desc' }
+            });
             return users as User[];
         } catch (error) {
             throw new Error('Failed to fetch users from database');
+        }
+    }
+
+    async count(): Promise<number> {
+        try {
+            return prisma.user.count();
+        } catch (error) {
+            throw new Error('Failed to count users from database');
         }
     }
 }
