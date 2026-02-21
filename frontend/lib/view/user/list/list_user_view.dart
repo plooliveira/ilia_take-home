@@ -109,11 +109,9 @@ class _UsersBody extends StatelessWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 800),
-          child: GroupWatch(
-            [ctrl.users],
-            builder: (context) {
-              final state = ctrl.users.value;
-
+          child: Watch(
+            ctrl.users,
+            builder: (context, state) {
               if (state.hasError) {
                 return UsersErrorWidget(
                   error: state.error,
