@@ -13,6 +13,7 @@ class UserFormCtrl with Ctrl {
   final emailController = TextEditingController();
 
   VoidCallback? onUserCreated;
+  void Function(String)? onUserCreationError;
 
   void createUser() {
     if (!(formKey.currentState?.validate() ?? false)) return;
@@ -28,7 +29,7 @@ class UserFormCtrl with Ctrl {
           onUserCreated?.call();
           break;
         case Err():
-          print(response.error);
+          onUserCreationError?.call(response.error);
           break;
       }
     });

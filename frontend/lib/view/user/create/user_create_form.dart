@@ -1,6 +1,7 @@
 import 'package:ctrl/ctrl.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/utils/validators.dart';
+import 'package:frontend/shared/widgets/app_toast.dart';
 import 'package:frontend/shared/widgets/custom_text_field.dart';
 import 'package:frontend/shared/widgets/primary_button.dart';
 import 'package:frontend/view/user/create/user_form_controller.dart';
@@ -13,7 +14,18 @@ class UserForm extends CtrlWidget<UserFormCtrl> {
   @override
   void onInit(BuildContext context, ctrl) {
     ctrl.onUserCreated = onUserCreated;
+    ctrl.onUserCreationError = (String error) =>
+        onUserCreationError(context, error);
     super.onInit(context, ctrl);
+  }
+
+  void onUserCreationError(BuildContext context, String error) {
+    AppToast.show(
+      context,
+      error,
+      position: ToastPosition.top,
+      backgroundColor: Colors.red,
+    );
   }
 
   @override
@@ -48,7 +60,7 @@ class UserForm extends CtrlWidget<UserFormCtrl> {
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
                   validator: AppValidators.combine([
-                    AppValidators.required('Nome é obrigatório'),
+                    // AppValidators.required('Nome é obrigatório'),
                   ]),
                 ),
                 const SizedBox(height: 16),
