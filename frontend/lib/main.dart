@@ -16,7 +16,7 @@ void main() {
       debug: kDebugMode,
     ),
   );
-  Locator().registerFactory<UserRepository>(
+  Locator().registerLazySingleton<UserRepository>(
     (i) => UserRepository(apiClient: i()),
   );
   Locator().registerFactory<UserCtrl>((i) => UserCtrl(userRepository: i()));
