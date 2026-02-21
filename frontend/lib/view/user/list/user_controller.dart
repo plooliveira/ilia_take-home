@@ -21,11 +21,13 @@ class UserCtrl with Ctrl {
   final UserRepository _userRepository;
 
   late final users = mutable<UserState>(UserState());
-
   final scrollController = ScrollController();
 
+  void setup() {
+    scrollController.addListener(_scrollListener);
+  }
+
   Future<void> getUsers() async {
-    // This is for initial load or pull-to-refresh
     await executeAsync(() async {
       users.update((state) {
         state.hasError = false;
@@ -86,6 +88,18 @@ class UserCtrl with Ctrl {
   void refreshUsers() async {
     await getUsers();
     _scrollToTop();
+  }
+
+  void _scrollListener() {
+    if (!scrollController.hasClients) return;
+
+    final maxScroll = scrollController.position.maxScrollExtent;
+    final currentScroll = scrollController.position.pixels;
+    const threshold = 200.0;
+
+    if (maxScroll - currentScroll <= threshold) {
+      loadMoreUsers();
+    }
   }
 
   void _scrollToTop() {

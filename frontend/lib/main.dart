@@ -13,7 +13,8 @@ void main() {
   Locator().registerLazySingleton<ApiClient>(
     (_) => HttpApiClient(
       kIsWeb ? WebApiClientConfig() : PlatformApiClientConfig(),
-      debug: kDebugMode,
+      // debug:
+      //     true, // If turn this on it will artificially delay the response by 1 seconds
     ),
   );
   Locator().registerLazySingleton<UserRepository>(

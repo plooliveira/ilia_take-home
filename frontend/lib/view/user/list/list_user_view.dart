@@ -31,6 +31,7 @@ class _UsersViewState extends CtrlState<UsersView> {
     super.initState();
     ctrl = useCtrl();
     ctrl.getUsers();
+    ctrl.setup();
   }
 
   // For this take-home, it's fine to keep this here. But in a real app,
@@ -156,32 +157,9 @@ class _UsersViewMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final narrowScreenActions = [
-      Watch(
-        ctrl.isLoading,
-        builder: (context, isLoading) {
-          return isLoading && !ctrl.users.value.firstLoad
-              ? const Padding(
-                  padding: EdgeInsets.only(right: 16.0),
-                  child: Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                )
-              : IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: () => ctrl.refreshUsers(),
-                );
-        },
-      ),
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar.mobile(title: _title, actions: narrowScreenActions),
+      appBar: CustomAppBar.mobile(title: _title),
       body: _UsersBody(ctrl: ctrl, scrollController: scrollController),
       floatingActionButton: FloatingActionButton(
         onPressed: onAddUser,
