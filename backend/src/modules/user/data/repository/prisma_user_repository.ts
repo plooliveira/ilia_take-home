@@ -9,8 +9,8 @@ import { prisma } from "../../../../prisma/prisma";
 import { Prisma } from "../../../../generated/prisma/client";
 
 @Injectable()
-export class PrismaUserRepository implements UserRepository  {
-    async create(createUserDto: CreateUserDto): Promise<User> {    
+export class PrismaUserRepository implements UserRepository {
+    async create(createUserDto: CreateUserDto): Promise<User> {
         try {
             const user = await prisma.user.create({
                 data: {
@@ -34,6 +34,7 @@ export class PrismaUserRepository implements UserRepository  {
             const users = await prisma.user.findMany({
                 skip: skip,
                 take: take,
+                orderBy: { createdAt: 'desc' }
             });
             return users as User[];
         } catch (error) {
