@@ -14,6 +14,7 @@ describe('UserService (Unit)', () => {
     const mockRepository = {
       create: jest.fn(),
       findAll: jest.fn(),
+      count: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -56,30 +57,43 @@ describe('UserService (Unit)', () => {
     it('should return Ok with list of users', async () => {
       const users = [mockUser];
       repository.findAll.mockResolvedValue(users);
+      repository.count.mockResolvedValue(1);
 
-      const result = await service.findAll();
+      const result = await service.findAll(1, 10);
 
       expect(result.isSuccess).toBe(true);
-      expect(result.value).toEqual(users);
+      expect(result.value).toEqual({
+        data: users,
+        meta: { total: 1, page: 1, lastPage: 1 }
+      });
+      expect(repository.findAll).toHaveBeenCalledWith(0, 10);
+      expect(repository.count).toHaveBeenCalled();
     });
 
     it('should return Ok with empty list when no users exist', async () => {
       repository.findAll.mockResolvedValue([]);
+      repository.count.mockResolvedValue(0);
 
-      const result = await service.findAll();
+      const result = await service.findAll(1, 10);
 
       expect(result.isSuccess).toBe(true);
-      expect(result.value).toEqual([]);
+      expect(result.value).toEqual({
+        data: [],
+        meta: { total: 0, page: 1, lastPage: 0 }
+      });
+      expect(repository.findAll).toHaveBeenCalledWith(0, 10);
+      expect(repository.count).toHaveBeenCalled();
     });
 
     it('should return Err when fetch fails', async () => {
       const error = new Error('Read failure');
       repository.findAll.mockRejectedValue(error);
 
-      const result = await service.findAll();
+      const result = await service.findAll(1, 10);
 
       expect(result.isError).toBe(true);
       expect(result.error).toBe(error);
+      expect(repository.findAll).toHaveBeenCalledWith(0, 10);
     });
   });
 });
