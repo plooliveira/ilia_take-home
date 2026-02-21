@@ -14,6 +14,7 @@ describe('UserModule Integration (Mocked Repository)', () => {
   const mockRepository = {
     create: jest.fn(),
     findAll: jest.fn(),
+    count: jest.fn(),
   };
 
   beforeAll(async () => {
@@ -87,10 +88,27 @@ describe('UserModule Integration (Mocked Repository)', () => {
   describe('GET /users', () => {
     it('should return 500 if database fails', async () => {
       mockRepository.findAll.mockRejectedValue(new Error('DB connection error'));
+      mockRepository.count.mockRejectedValue(new Error('DB connection error'));
 
-      const response = await request(app.getHttpServer()).get('/users');
+      const response = await request(app.getHttpServer()).get('/users?page=1&limit=10');
 
       expect(response.status).toBe(500);
+    });
+
+    it('should return 200 with paginated users', async () => {
+      const users = [{ name: 'John Doe', email: 'john@test.com' }];
+      mockRepository.findAll.mockResolvedValue(users);
+      mockRepository.count.mockResolvedValue(1);
+
+      const response = await request(app.getHttpServer()).get('/users?page=1&limit=10');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        data: users,
+        meta: { total: 1, page: 1, lastPage: 1 }
+      });
+      expect(mockRepository.findAll).toHaveBeenCalledWith(0, 10);
+      expect(mockRepository.count).toHaveBeenCalled();
     });
   });
 });
