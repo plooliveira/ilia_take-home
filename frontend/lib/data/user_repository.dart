@@ -1,4 +1,5 @@
 import 'package:frontend/data/api/http_client.dart';
+import 'package:frontend/data/pagination_model.dart';
 import 'package:frontend/data/user_model.dart';
 import 'package:frontend/shared/result.dart';
 
@@ -7,12 +8,11 @@ class UserRepository {
 
   UserRepository({required this.apiClient});
 
-  Future<Result<List<User>>> getAllUsers() async {
+  Future<Result<PaginatedUsers>> getAllUsers({int page = 1}) async {
     try {
-      final response = await apiClient.get('users');
-      final List<dynamic> data = response as List<dynamic>;
-      final users = data.map((json) => User.fromJson(json)).toList();
-      return Ok(users);
+      final response = await apiClient.get('users?page=$page');
+      final paginatedUsers = PaginatedUsers.fromJson(response);
+      return Ok(paginatedUsers);
     } on NetworkException catch (e) {
       return Err(e.message);
     } catch (e) {
@@ -20,13 +20,15 @@ class UserRepository {
     }
   }
 
-  Future<Result<bool>> createUser({
+  Future<Result<User>> createUser({
     required String name,
     required String email,
   }) async {
     try {
-      await apiClient.post('users', {'name': name, 'email': email});
-      return Ok(true);
+      final response =
+          await apiClient.post('users', {'name': name, 'email': email});
+      final user = User.fromJson(response);
+      return Ok(user);
     } on NetworkException catch (e) {
       if (e.listMessages.isNotEmpty) {
         return Err(e.listMessages.join('\n'));

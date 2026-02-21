@@ -6,13 +6,21 @@ import 'package:shimmer/shimmer.dart';
 class UserList extends StatelessWidget {
   final List<User> users;
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMorePages;
   final void Function(User)? onUserTap;
+  final VoidCallback? onLoadMore;
+  final ScrollController? scrollController;
 
   const UserList({
     super.key,
     required this.users,
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMorePages = false,
     this.onUserTap,
+    this.onLoadMore,
+    this.scrollController,
   });
 
   @override
@@ -36,11 +44,21 @@ class UserList extends StatelessWidget {
       );
     }
 
+    final itemCount = users.length + (hasMorePages ? 1 : 0);
     return ListView.separated(
+      controller: scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      itemCount: users.length,
+      itemCount: itemCount,
       separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
+        if (index == users.length) {
+          onLoadMore?.call();
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         final user = users[index];
         return UserCard(
           user: user,

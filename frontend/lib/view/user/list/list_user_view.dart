@@ -47,7 +47,7 @@ class _UsersViewState extends CtrlState<UsersView> {
             child: UserForm(
               onUserCreated: () {
                 Navigator.pop(context);
-                ctrl.getUsers();
+                ctrl.refreshUsers();
               },
             ),
           ),
@@ -61,7 +61,7 @@ class _UsersViewState extends CtrlState<UsersView> {
           return UserForm(
             onUserCreated: () {
               Navigator.pop(context);
-              ctrl.getUsers();
+              ctrl.refreshUsers();
             },
           );
         },
@@ -78,11 +78,13 @@ class _UsersViewState extends CtrlState<UsersView> {
             ctrl:
                 ctrl, // I prefer constructor injection for shallow widget trees
             onAddUser: () => showCreateBottonSheet(context),
+            scrollController: ctrl.scrollController,
           );
         } else {
           return _UsersViewMobile(
             ctrl: ctrl,
             onAddUser: () => showCreateBottonSheet(context),
+            scrollController: ctrl.scrollController,
           );
         }
       },
@@ -94,14 +96,15 @@ class _UsersViewState extends CtrlState<UsersView> {
 // But again, for this take-home, it's fine to keep them here in my opinion.
 
 class _UsersBody extends StatelessWidget {
-  const _UsersBody({required this.ctrl});
+  const _UsersBody({required this.ctrl, required this.scrollController});
 
   final UserCtrl ctrl;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => ctrl.getUsers(),
+      onRefresh: () async => ctrl.refreshUsers(),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 800),
@@ -124,6 +127,10 @@ class _UsersBody extends StatelessWidget {
               return UserList(
                 users: state.users,
                 isLoading: ctrl.isLoading.value && state.firstLoad,
+                isLoadingMore: state.isLoadingMore,
+                hasMorePages: state.hasMorePages,
+                onLoadMore: ctrl.loadMoreUsers,
+                scrollController: scrollController,
                 onUserTap: (user) {
                   // Future navigation to user details or whatever...
                 },
@@ -137,10 +144,15 @@ class _UsersBody extends StatelessWidget {
 }
 
 class _UsersViewMobile extends StatelessWidget {
-  const _UsersViewMobile({required this.ctrl, required this.onAddUser});
+  const _UsersViewMobile({
+    required this.ctrl,
+    required this.onAddUser,
+    required this.scrollController,
+  });
 
   final UserCtrl ctrl;
   final VoidCallback onAddUser;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +173,7 @@ class _UsersViewMobile extends StatelessWidget {
                 )
               : IconButton(
                   icon: const Icon(Icons.refresh),
-                  onPressed: () => ctrl.getUsers(),
+                  onPressed: () => ctrl.refreshUsers(),
                 );
         },
       ),
@@ -170,7 +182,7 @@ class _UsersViewMobile extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar.mobile(title: _title, actions: narrowScreenActions),
-      body: _UsersBody(ctrl: ctrl),
+      body: _UsersBody(ctrl: ctrl, scrollController: scrollController),
       floatingActionButton: FloatingActionButton(
         onPressed: onAddUser,
         child: const Icon(Icons.add),
@@ -180,10 +192,15 @@ class _UsersViewMobile extends StatelessWidget {
 }
 
 class _UsersViewDesktop extends StatelessWidget {
-  const _UsersViewDesktop({required this.ctrl, required this.onAddUser});
+  const _UsersViewDesktop({
+    required this.ctrl,
+    required this.onAddUser,
+    required this.scrollController,
+  });
 
   final UserCtrl ctrl;
   final VoidCallback onAddUser;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +219,7 @@ class _UsersViewDesktop extends StatelessWidget {
                 )
               : IconButton(
                   icon: const Icon(Icons.refresh),
-                  onPressed: () => ctrl.getUsers(),
+                  onPressed: () => ctrl.refreshUsers(),
                 );
         },
       ),
@@ -220,7 +237,7 @@ class _UsersViewDesktop extends StatelessWidget {
         title: _title,
         actions: wideScreenActions,
       ),
-      body: _UsersBody(ctrl: ctrl),
+      body: _UsersBody(ctrl: ctrl, scrollController: scrollController),
     );
   }
 }
