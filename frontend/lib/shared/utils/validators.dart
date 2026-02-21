@@ -28,13 +28,4 @@ class AppValidators {
       return null;
     };
   }
-
-  static String? Function(String?) fullName(String message) {
-    return (String? value) {
-      final name = value?.trim() ?? '';
-      if (name.isEmpty) return null;
-      if (name.split(' ').length < 2) return message;
-      return null;
-    };
-  }
 }

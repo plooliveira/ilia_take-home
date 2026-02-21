@@ -19,13 +19,16 @@ abstract class ApiClient {
   Future<dynamic> post(String url, Map<String, dynamic> data);
 }
 
-// implementação usando http package
-
 class HttpApiClient implements ApiClient {
+  final bool _debug;
+
+  /// [debug] if true, adds a delay of 1 second to each request.
+  HttpApiClient({bool debug = false}) : _debug = debug;
   static const _timeoutDuration = Duration(seconds: 10);
 
   @override
   Future<dynamic> get(String url) async {
+    if (_debug) await Future.delayed(const Duration(seconds: 1));
     try {
       final response = await http
           .get(Uri.parse(_baseUrl + url))
@@ -43,6 +46,7 @@ class HttpApiClient implements ApiClient {
 
   @override
   Future<dynamic> post(String url, Map<String, dynamic> data) async {
+    if (_debug) await Future.delayed(const Duration(seconds: 1));
     try {
       final response = await http
           .post(

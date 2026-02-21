@@ -49,7 +49,6 @@ class UserForm extends CtrlWidget<UserFormCtrl> {
                   textInputAction: TextInputAction.next,
                   validator: AppValidators.combine([
                     AppValidators.required('Nome é obrigatório'),
-                    AppValidators.fullName('Insira o nome completo'),
                   ]),
                 ),
                 const SizedBox(height: 16),

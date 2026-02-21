@@ -7,7 +7,7 @@ import 'package:frontend/view/user/list/user_controller.dart';
 import 'package:frontend/view/user/create/user_form_controller.dart';
 
 void main() {
-  Locator().registerLazySingleton<ApiClient>((_) => HttpApiClient());
+  Locator().registerLazySingleton<ApiClient>((_) => HttpApiClient(debug: true));
   Locator().registerFactory<UserRepository>(
     (i) => UserRepository(apiClient: i()),
   );
