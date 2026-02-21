@@ -1,5 +1,8 @@
 import 'package:ctrl/ctrl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/data/api/config/platform_api_config.dart';
+import 'package:frontend/data/api/config/web_api_config.dart';
 import 'package:frontend/data/api/http_client.dart';
 import 'package:frontend/data/user_repository.dart';
 import 'package:frontend/routes.dart';
@@ -7,7 +10,12 @@ import 'package:frontend/view/user/list/user_controller.dart';
 import 'package:frontend/view/user/create/user_form_controller.dart';
 
 void main() {
-  Locator().registerLazySingleton<ApiClient>((_) => HttpApiClient(debug: true));
+  Locator().registerLazySingleton<ApiClient>(
+    (_) => HttpApiClient(
+      kIsWeb ? WebApiClientConfig() : PlatformApiClientConfig(),
+      debug: kDebugMode,
+    ),
+  );
   Locator().registerFactory<UserRepository>(
     (i) => UserRepository(apiClient: i()),
   );

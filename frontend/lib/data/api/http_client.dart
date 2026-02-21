@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:frontend/data/api/config/api_config.dart';
 import 'package:http/http.dart' as http;
 
 const _timeoutMessage = 'Tempo de resposta excedido (TimeoutException)';
 const _noConnectionMessage = 'Sem conexão com a internet (SocketException)';
-final _baseUrl = 'http://localhost:3000/';
 
 class NetworkException implements Exception {
   final String message;
@@ -16,15 +16,21 @@ class NetworkException implements Exception {
 }
 
 abstract class ApiClient {
+  ApiClient(this.config);
+  final ApiConfig config;
+
   Future<dynamic> get(String url);
   Future<dynamic> post(String url, Map<String, dynamic> data);
 }
 
 class HttpApiClient implements ApiClient {
+  /// [debug] if true, adds a delay of 1 second to each request.
+  HttpApiClient(this.config, {bool debug = false}) : _debug = debug;
+
+  @override
+  final ApiConfig config;
   final bool _debug;
 
-  /// [debug] if true, adds a delay of 1 second to each request.
-  HttpApiClient({bool debug = false}) : _debug = debug;
   static const _timeoutDuration = Duration(seconds: 10);
 
   @override
@@ -32,7 +38,7 @@ class HttpApiClient implements ApiClient {
     if (_debug) await Future.delayed(const Duration(seconds: 1));
     try {
       final response = await http
-          .get(Uri.parse(_baseUrl + url))
+          .get(Uri.parse(config.baseUrl + url))
           .timeout(_timeoutDuration);
 
       return _handleResponse(response);
@@ -51,7 +57,7 @@ class HttpApiClient implements ApiClient {
     try {
       final response = await http
           .post(
-            Uri.parse(_baseUrl + url),
+            Uri.parse(config.baseUrl + url),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(data),
           )
@@ -91,11 +97,7 @@ class HttpApiClient implements ApiClient {
         message = body['error'] ?? 'Erro desconhecido';
       }
 
-      throw NetworkException(
-        message,
-        response.statusCode,
-        listMessages,
-      );
+      throw NetworkException(message, response.statusCode, listMessages);
     }
   }
 }
