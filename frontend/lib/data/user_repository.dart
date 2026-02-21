@@ -28,6 +28,9 @@ class UserRepository {
       await apiClient.post('users', {'name': name, 'email': email});
       return Ok(true);
     } on NetworkException catch (e) {
+      if (e.listMessages.isNotEmpty) {
+        return Err(e.listMessages.join('\n'));
+      }
       return Err(e.message);
     } catch (e) {
       return Err('Erro inesperado ao criar usuário: $e');

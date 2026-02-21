@@ -10,8 +10,9 @@ final _baseUrl = 'http://localhost:3000/';
 
 class NetworkException implements Exception {
   final String message;
+  final List<String> listMessages;
   final int statusCode;
-  NetworkException(this.message, this.statusCode);
+  NetworkException(this.message, this.statusCode, this.listMessages);
 }
 
 abstract class ApiClient {
@@ -36,9 +37,9 @@ class HttpApiClient implements ApiClient {
 
       return _handleResponse(response);
     } on SocketException {
-      throw NetworkException(_noConnectionMessage, 0);
+      throw NetworkException(_noConnectionMessage, 0, []);
     } on TimeoutException {
-      throw NetworkException(_timeoutMessage, 408);
+      throw NetworkException(_timeoutMessage, 408, []);
     } catch (e) {
       rethrow;
     }
@@ -58,9 +59,9 @@ class HttpApiClient implements ApiClient {
 
       return _handleResponse(response);
     } on SocketException {
-      throw NetworkException(_noConnectionMessage, 0);
+      throw NetworkException(_noConnectionMessage, 0, []);
     } on TimeoutException {
-      throw NetworkException(_timeoutMessage, 408);
+      throw NetworkException(_timeoutMessage, 408, []);
     } catch (e) {
       rethrow;
     }
@@ -71,11 +72,29 @@ class HttpApiClient implements ApiClient {
       if (response.body.isEmpty) return null;
       return jsonDecode(response.body);
     } else {
+      if (response.body.isEmpty) {
+        throw NetworkException('Erro desconhecido', response.statusCode, []);
+      }
+
+      final body = jsonDecode(response.body);
+      final messageValue = body['message'];
+
+      String message;
+      List<String> listMessages = [];
+
+      if (messageValue is String) {
+        message = messageValue;
+      } else if (messageValue is List) {
+        listMessages = messageValue.cast<String>().toList();
+        message = 'Invalid input';
+      } else {
+        message = body['error'] ?? 'Erro desconhecido';
+      }
+
       throw NetworkException(
-        response.body.isNotEmpty
-            ? jsonDecode(response.body)['message'] ?? 'Erro desconhecido'
-            : 'Erro desconhecido',
+        message,
         response.statusCode,
+        listMessages,
       );
     }
   }

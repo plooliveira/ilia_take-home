@@ -60,7 +60,8 @@ class UserForm extends CtrlWidget<UserFormCtrl> {
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
                   validator: AppValidators.combine([
-                    // AppValidators.required('Nome é obrigatório'),
+                    // Comment to test the error message coming from the backend
+                    AppValidators.required('Nome é obrigatório'),
                   ]),
                 ),
                 const SizedBox(height: 16),
@@ -71,6 +72,7 @@ class UserForm extends CtrlWidget<UserFormCtrl> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   validator: AppValidators.combine([
+                    // Comment to test the error message coming from the backend
                     AppValidators.required('E-mail é obrigatório'),
                     AppValidators.email('E-mail inválido'),
                   ]),
