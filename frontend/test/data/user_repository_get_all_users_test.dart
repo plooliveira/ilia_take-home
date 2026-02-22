@@ -84,7 +84,7 @@ void main() {
     });
 
     test(
-      'returns Err(listMessages joined by \"\\n\") when NetworkException has listMessages',
+      'returns Err(listMessages joined by "\n") when NetworkException has listMessages',
       () async {
         when(
           () => apiClient.post('users', any(that: isA<Map<String, dynamic>>())),
