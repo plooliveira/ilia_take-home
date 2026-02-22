@@ -1,16 +1,53 @@
-# frontend
+# Frontend (Flutter)
 
-A new Flutter project.
+Este é o app Flutter do take-home, com navegação responsiva e consumo de API paginada.
 
-## Getting Started
+## Rodando localmente
 
-This project is a starting point for a Flutter application.
+```bash
+# Instalar dependências
+flutter pub get
 
-A few resources to get you started if this is your first Flutter project:
+# Rodar em modo desenvolvimento
+flutter run
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+# Rodar os testes
+flutter test
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Estrutura
+
+- `lib/data/` - Models, repositórios e cliente HTTP
+- `lib/view/` - Telas e controllers (estado com `Ctrl`)
+- `lib/shared/` - Utilitários (`Result`, `Locator`)
+- `test/` - Testes unitários com `mocktail`
+
+## Arquitetura
+
+Arquitetura em camadas simples:
+- **View Layer** - Widgets e controllers (`UserCtrl`, `UserFormCtrl`)
+- **Data Layer** - Repositórios e cliente HTTP (`UserRepository`, `ApiClient`)
+- **Shared Layer** - Utilitários compartilhados (`Result`, `Locator`)
+
+
+## Testes
+
+Testes pragmáticos focados em:
+- `UserRepository` (camada de dados)
+- `UserCtrl` (estado da UI)
+
+```bash
+flutter test
+```
+
+## Dependências principais
+
+- `go_router` - Navegação declarativa
+- `http` - Cliente HTTP
+- `mocktail` - Mocks para testes
+- `ctrl` - Gerenciamento de estado reativo com Service Locator integrado
+- `shimmer` - Efeito de loading skeleton
+
+## Responsividade
+
+A UI se adapta entre mobile e desktop usando layouts condicionais em `UsersView`.
