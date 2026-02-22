@@ -8,7 +8,9 @@ Aplicação de cadastro de usuários com:
 - **Cadastro de usuários** com validação de email e nome
 - **Listagem paginada** com loading states e tratamento de erros
 - **Interface responsiva** que funciona em mobile, web e desktop
-- **API REST** robusta com paginação e rate limiting
+
+> [!NOTE]
+> Foram deixados alguns comentários orientadores pelo código para facilitar a compreensão de certas decisões técnicas e fluxos da aplicação.
 
 ## Como Rodar
 
@@ -22,6 +24,10 @@ npx prisma migrate dev
 npx prisma generate
 npm run start:dev
 ```
+
+**Documentação da API:**
+Após rodar o backend, acesse a documentação interativa em:
+[http://localhost:3000/api](http://localhost:3000/api)
 
 ### Frontend (Flutter)
 Veja [frontend/README.md](./frontend/README.md) para instruções detalhadas:

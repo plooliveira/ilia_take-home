@@ -44,6 +44,13 @@ Arquitetura em camadas (módulos padrão NestJS) com repository para adapter do 
 - `@prisma/adapter-better-sqlite3` - Driver SQLite
 - `class-validator` - Validação de DTOs
 - `@nestjs/throttler` - Rate limiting
+- `@nestjs/swagger` - Documentação OpenAPI (Swagger)
+- `Log Decorator` - Sistema de log automático via padrão Decorator
+
+## Documentação API (Swagger)
+
+A documentação interativa da API (Swagger UI) está disponível em:
+`http://localhost:3000/api`
 
 ## Testes
 
@@ -65,6 +72,81 @@ npm run test:cov
 - `POST /users` - Criar usuário
 - `GET /users` - Listar usuários (paginado)
 - `GET /users?page=1&limit=10` - Listar com paginação
+
+## Exemplos de Requests e Responses
+
+### POST /users
+
+Request
+
+```
+curl -s -X POST http://localhost:3000/users \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Leia Organa","email":"organa@email.com"}'
+```
+
+Response 201
+
+```
+{
+  "name": "Leia Organa",
+  "email": "organa@email.com"
+}
+```
+
+Response 400 (validação)
+
+```
+{
+  "statusCode": 400,
+  "message": [
+    "Invalid email format",
+    "Name should not be empty"
+  ],
+  "error": "Bad Request"
+}
+```
+
+Response 409 (e-mail duplicado)
+
+```
+{
+  "statusCode": 409,
+  "message": "Email already exists",
+  "error": "Conflict"
+}
+```
+
+### GET /users
+
+Request
+
+```
+curl -s "http://localhost:3000/users?page=1&limit=10"
+```
+
+Response 200
+
+```
+{
+  "data": [
+    { "name": "John Doe", "email": "john@example.com" }
+  ],
+  "meta": { "total": 1, "page": 1, "lastPage": 1 }
+}
+```
+
+Response 500 (exemplo)
+
+```
+{
+  "statusCode": 500,
+  "message": "DB connection error",
+  "error": "Internal Server Error"
+}
+```
+
+> Observação: consulte o Swagger em `http://localhost:3000/api` para explorar e testar os endpoints interativamente.
 
 ## Banco de Dados
 
