@@ -15,8 +15,7 @@ export function Log(context?: string) {
     ) {
         const originalMethod = descriptor.value;
 
-        descriptor.value = async function (this: unknown, ...args: unknown[]) {
-            const className = (target as any).constructor.name;
+        const wrappedMethod = async function (this: unknown, ...args: unknown[]) {
             const methodName = propertyKey;
 
             logger.log(`Calling ${methodName} with args: ${JSON.stringify(args)}`);
@@ -34,6 +33,13 @@ export function Log(context?: string) {
                 throw error;
             }
         };
+
+        for (const key of Reflect.getMetadataKeys(originalMethod)) {
+            const metadata = Reflect.getMetadata(key, originalMethod);
+            Reflect.defineMetadata(key, metadata, wrappedMethod);
+        }
+
+        descriptor.value = wrappedMethod;
 
         return descriptor;
     };
