@@ -48,7 +48,13 @@ flutter run
 
 - **Frontend**: Flutter com arquitetura em camadas simples, gerenciamento de estado com `Ctrl` e Service Locator
 - **Backend**: NestJS com módulos padrão, Prisma ORM e SQLite
-- **Comunicação**: API REST com paginação e tratamento de erros
+- **Comunicação**: API REST robusta com paginação e rate limiting
+
+## Tecnologia e Versões
+
+- **Backend**: NestJS 11
+- **Frontend**: Flutter 3.38 (Dart 3.10)
+- **Banco de Dados**: SQLite com Prisma ORM
 
 ## Testes
 

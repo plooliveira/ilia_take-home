@@ -1,6 +1,6 @@
-# Backend (NestJS)
+# Backend (NestJS 11)
 
-API REST para gestão de usuários com NestJS, Prisma e SQLite.
+API REST para gestão de usuários com NestJS 11, Prisma e SQLite.
 
 ## Rodando localmente
 
