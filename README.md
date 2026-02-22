@@ -20,6 +20,7 @@ Veja [backend/README.md](./backend/README.md) para instruções detalhadas:
 ```bash
 cd backend
 npm install
+echo "DATABASE_URL=file:./dev.db" > .env
 npx prisma migrate dev
 npx prisma generate
 npm run start:dev
