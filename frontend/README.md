@@ -19,7 +19,7 @@ flutter test
 
 - `lib/data/` - Models, repositórios e cliente HTTP
 - `lib/view/` - Telas e controllers (estado com `Ctrl`)
-- `lib/shared/` - Utilitários (`Result`, `Locator`)
+- `lib/shared/` - Utilitários (`Result`, `Validators`)
 - `test/` - Testes unitários com `mocktail`
 
 ## Arquitetura
@@ -27,7 +27,7 @@ flutter test
 Arquitetura em camadas simples:
 - **View Layer** - Widgets e controllers (`UserCtrl`, `UserFormCtrl`)
 - **Data Layer** - Repositórios e cliente HTTP (`UserRepository`, `ApiClient`)
-- **Shared Layer** - Utilitários compartilhados (`Result`, `Locator`)
+- **Shared Layer** - Utilitários compartilhados (`Result`, `Validators`)
 
 
 ## Testes
